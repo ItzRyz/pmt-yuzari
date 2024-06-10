@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "foreignKeys"
+}
+
+model Menu {
+  id Int @id @default(autoincrement())
+
+  name String
+
+  masterId   Int?         @map("master_id")
+  master     Menu?        @relation(name: "MenuMaster", fields: [masterId], references: [id])
+  submenus   Menu[]       @relation(name: "MenuMaster")
+  MenuAccess MenuAccess[]
+}
+
+model User {
+  id Int @id @default(autoincrement())
+
+  username  String
+  password  String
+  secret    String?
+  UserGroup UserGroup[]
+}
+
+model Group {
+  id Int @id @default(autoincrement())
+
+  name       String
+  UserGroup  UserGroup[]
+  MenuAccess MenuAccess[]
+}
+
+model UserGroup {
+  id Int @id @default(autoincrement())
+
+  userId  Int
+  groupId Int
+
+  user  User  @relation(fields: [userId], references: [id])
+  group Group @relation(fields: [groupId], references: [id])
+}
+
+model Access {
+  id Int @id @default(autoincrement())
+
+  name       String
+  MenuAccess MenuAccess[]
+}
+
+model MenuAccess {
+  id Int @id @default(autoincrement())
+
+  menuId   Int
+  groupId  Int
+  accessId Int
+
+  menu   Menu   @relation(fields: [menuId], references: [id])
+  group  Group  @relation(fields: [groupId], references: [id])
+  access Access @relation(fields: [accessId], references: [id])
+}
+
+model Profile {
+  id Int @id @default(autoincrement())
+
+  name String
+}

@@ -14,65 +14,48 @@ datasource db {
   relationMode = "foreignKeys"
 }
 
-model Menu {
-  id Int @id @default(autoincrement())
-
-  name String
-
-  masterId   Int?         @map("master_id")
-  master     Menu?        @relation(name: "MenuMaster", fields: [masterId], references: [id])
-  submenus   Menu[]       @relation(name: "MenuMaster")
-  MenuAccess MenuAccess[]
+enum Gender {
+  Man
+  Women
 }
 
 model User {
   id Int @id @default(autoincrement())
 
-  username  String
-  password  String
-  secret    String?
-  UserGroup UserGroup[]
-}
+  username String
+  email    String
+  password String
 
-model Group {
-  id Int @id @default(autoincrement())
-
-  name       String
-  UserGroup  UserGroup[]
-  MenuAccess MenuAccess[]
-}
-
-model UserGroup {
-  id Int @id @default(autoincrement())
-
-  userId  Int
-  groupId Int
-
-  user  User  @relation(fields: [userId], references: [id])
-  group Group @relation(fields: [groupId], references: [id])
-}
-
-model Access {
-  id Int @id @default(autoincrement())
-
-  name       String
-  MenuAccess MenuAccess[]
-}
-
-model MenuAccess {
-  id Int @id @default(autoincrement())
-
-  menuId   Int
-  groupId  Int
-  accessId Int
-
-  menu   Menu   @relation(fields: [menuId], references: [id])
-  group  Group  @relation(fields: [groupId], references: [id])
-  access Access @relation(fields: [accessId], references: [id])
+  companyid   Int
+  UserCompany UserCompany[]
 }
 
 model Profile {
   id Int @id @default(autoincrement())
 
+  firstname String
+  lastname  String
+  gender    Gender
+  birthdate DateTime
+
+  picture String @db.LongText
+}
+
+model Company {
+  id Int @id @default(autoincrement())
+
   name String
+  code String @unique
+
+  UserCompany UserCompany[]
+}
+
+model UserCompany {
+  id Int @id @default(autoincrement())
+
+  userid    Int
+  companyid Int
+
+  user    User    @relation(fields: [userid], references: [id])
+  company Company @relation(fields: [companyid], references: [id])
 }
